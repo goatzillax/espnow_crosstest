@@ -61,11 +61,11 @@ void infra_setup() {
    if (WiFi.status() == WL_CONNECTED) {
       Serial.println(WiFi.localIP());
    }
-   else {
-      WiFi.disconnect();
+//   else {
+//      WiFi.disconnect();
       WiFi.softAP("softap", "password", 5, 0);
       Serial.println(WiFi.softAPIP());
-   }
+//   }
    Serial.print("Wi-Fi Channel: ");
    Serial.println(WiFi.channel());  //  Yes, I do know the correct channel my regular AP is on and have verified it with other scanners.
 
@@ -85,6 +85,8 @@ void setup() {
    LED_pixel.begin();
    LED_pixel.clear();
    LED_pixel.show();
+
+   pinMode(9, INPUT_PULLUP);
 
 #define DEBUG
 #ifdef DEBUG
@@ -113,8 +115,17 @@ void setup() {
    esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
 }
 
+uint32_t debounce=0;
+
 void loop() {
    infra_loop();
    cycle_buzzer();
+
+   if (!digitalRead(9) && (millis()-debounce > 1000)) {
+      debounce = millis();
+      Serial.println("disconnecting WiFi");
+      WiFi.disconnect();
+   }
+
    delay(100);
 }
