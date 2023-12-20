@@ -63,8 +63,8 @@ void infra_setup() {
    }
 //   else {
 //      WiFi.disconnect();
-      WiFi.softAP("softap", "password", 5, 0);
-      Serial.println(WiFi.softAPIP());
+//      WiFi.softAP("softap", "password", 5, 0);
+//      Serial.println(WiFi.softAPIP());
 //   }
    Serial.print("Wi-Fi Channel: ");
    Serial.println(WiFi.channel());  //  Yes, I do know the correct channel my regular AP is on and have verified it with other scanners.
@@ -99,18 +99,19 @@ void setup() {
 
    WiFi.disconnect();
    WiFi.persistent(false);
-   WiFi.mode(WIFI_AP_STA);
+   WiFi.mode(WIFI_STA);
 
    WiFi.setSleep(false);
-   
-   infra_setup();
 
+   Serial.println("Initialiing ESP-NOW");
    if (esp_now_init() != 0) {
-      Serial.println("Error initializing ESP-NOW");
+      Serial.println("Error");
       delay(10000);
       ESP.deepSleep(0);
       return;
    }
+
+   infra_setup();
 
    esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
 }
