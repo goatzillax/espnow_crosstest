@@ -2,8 +2,6 @@
 #include <espnow.h>
 #include "espnow_msg.h"
 
-uint8_t masterAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};  //  broadcast works, unicast does not if RX is connected to an AP
-
 int wifi_search_chan;
 
 struct_espnow_msg msg;
@@ -53,8 +51,8 @@ void setup() {
 
    xmit_state = XMIT_IDLE;
 
-   wifi_search_chan = 5;  //  set ur channel here
-   if (esp_now_add_peer(masterAddr, ESP_NOW_ROLE_SLAVE, wifi_search_chan, NULL, 0)) {
+   wifi_search_chan = 3;  //  set ur channel here
+   if (esp_now_add_peer(masterDeviceMac, ESP_NOW_ROLE_SLAVE, wifi_search_chan, NULL, 0)) {
       Serial.println("error adding peer");
       deepSleep();
    }
@@ -73,7 +71,7 @@ void loop() {
             msg.count = 0;
             xmit_state = XMIT_STARTED;
             digitalWrite(LED_BUILTIN, LOW);
-            esp_now_send(masterAddr, (uint8_t *)&msg, sizeof(msg));
+            esp_now_send(masterDeviceMac, (uint8_t *)&msg, sizeof(msg));
          }
       case XMIT_STARTED:
          delay(100);

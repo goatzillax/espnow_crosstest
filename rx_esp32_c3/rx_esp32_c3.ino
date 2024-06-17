@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <esp_wifi.h>
 #include <esp_now.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -93,25 +94,33 @@ void setup() {
    delay(1000);
    Serial.println();
    Serial.println();
-   Serial.print("MAC Address:  ");
-   Serial.println(WiFi.macAddress());
 #endif
+
+  Serial.print("ESP-IDF major ");
+  Serial.println(ESP_IDF_VERSION_MAJOR);
+  Serial.print("ESP-IDF minor ");
+  Serial.println(ESP_IDF_VERSION_MINOR);
 
    WiFi.disconnect();
    WiFi.persistent(false);
    WiFi.mode(WIFI_STA);
 
+   esp_wifi_set_mac(WIFI_IF_STA, &masterDeviceMac[0]);
+
+   Serial.print("MAC Address:  ");
+   Serial.println(WiFi.macAddress());
+
    WiFi.setSleep(false);
 
-   Serial.println("Initialiing ESP-NOW");
+   infra_setup();
+
+   Serial.println("Initializing ESP-NOW");
    if (esp_now_init() != 0) {
       Serial.println("Error");
       delay(10000);
       ESP.deepSleep(0);
       return;
    }
-
-   infra_setup();
 
    esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
 }
